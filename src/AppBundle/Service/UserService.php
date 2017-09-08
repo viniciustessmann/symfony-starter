@@ -14,18 +14,17 @@ class UserService
         $this->em = $entityManager;
     }
 
-    public static function registerUser($data)
+    public function registerUser($data)
     {   
-       
         $user = new User();
-        $user->setUsername($data->request->get('name'));
-        $user->setEmail($data->request->get('email'));
+        $user->setUsername($data->request->get('name') . date('h:i:s'));
+        $user->setEmail($data->request->get('email')  . date('h:i:s'));
         $user->setConfirmationToken(md5(date('Y-m-d h:i:s')));
         $user->setPassword('123456');
 
-        //$this->em;
-        // $this->em->flush();
-
-        echo 'Enter here to register new user';
+        $this->em->persist($user);
+        $this->em->flush();
+        
+        return $user->getId();
     }
 }

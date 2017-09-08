@@ -18,8 +18,17 @@ class SecurityController extends Controller
     public function createAction(Request $request) 
     {    
         $userRegister = $this->get(UserService::class);
-        $userRegister->registerUser($request);
+        $userId = $userRegister->registerUser($request);
+        
+        header('Content-type: application/json');
+
+        $response = [
+            'success' => true,
+            'userId' => $userId
+        ];
+
+        echo json_encode($response);
         die;
-  
+
     }
 }
