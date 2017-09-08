@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\UserBundle\Doctrine\UserManager;
 use AppBundle\Entity\User;
+use AppBundle\Service\UserService;
 
 class SecurityController extends Controller
 {   
@@ -16,16 +17,9 @@ class SecurityController extends Controller
      */
     public function createAction(Request $request) 
     {    
-        $em = $this->getDoctrine()->getManager();
-
-        $user = new User();
-        $user->setUsername($request->request->get('name'));
-        $user->setEmail($request->request->get('email'));
-        $user->setConfirmationToken(md5(date('Y-m-d h:i:s')));
-
-        $em->persist($user);
-        $em->flush();
-
-        die;    
+        $userRegister = $this->get(UserService::class);
+        $userRegister->registerUser($request);
+        die;
+  
     }
 }

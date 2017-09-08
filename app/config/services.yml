@@ -29,6 +29,13 @@ services:
         public: true
         tags: ['controller.service_arguments']
 
+    AppBundle\Service\:
+        resource: '../../src/AppBundle/Service'
+        public: true
+        autowire: false
+        tags: ['service.service_arguments']
+        arguments: ["@doctrine.orm.entity_manager"]
+
     # add more services, or override services that need manual wiring
     # AppBundle\Service\ExampleService:
     #     arguments:
