@@ -1,0 +1,13 @@
+# Use root/example as user/password credentials
+version: '2.0'
+
+services:
+    db:
+        image: mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_PASSWORD: root
+            MYSQL_USER: root
+            MYSQL_DATABASE: symfonystarter
+        ports:
+            - 3306:3306
