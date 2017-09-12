@@ -8,12 +8,13 @@ use Symfony\Component\HttpFoundation\Request;
 use FOS\UserBundle\Doctrine\UserManager;
 use AppBundle\Entity\User;
 use AppBundle\Service\UserService;
+use AppBundle\Service\MailerService;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\Form\FormBuilder;
 
 class SecurityController extends Controller
 {   
-
     /**
      *
      * @Route("/detail_user", name="detail_user")
@@ -21,7 +22,7 @@ class SecurityController extends Controller
     public function detailAction(Request $request) 
     {    
         $userRegister = $this->get(UserService::class);
-        $user = $userRegister->infoUser($request);
+        $user = $userRegister->infoUser($this->getUser()->getId());
 
         header('Content-type: application/json');
 
@@ -40,7 +41,6 @@ class SecurityController extends Controller
      */
     public function createAction(Request $request) 
     {    
-
         $user = new User();
 
         $plainPassword = 'ryanpass';
@@ -56,7 +56,6 @@ class SecurityController extends Controller
         $user->setPassword($password);
         $user->addRole($request->request->get('role'));
 
-
         $userRegister = $this->get(UserService::class);
         $userId = $userRegister->registerUser($user);
 
@@ -66,6 +65,11 @@ class SecurityController extends Controller
             echo json_encode($userId);
             die;
         }
+
+        $mailerService = $this->get(MailerService::class);
+        
+        $content = self::getContent($userId);
+        $responseMailer = $mailerService->sendEmail('viniciusschleetessmann@gmail.com', 'Ative sua conta', $content);
 
         $response = [
             'success' => true,
@@ -77,6 +81,13 @@ class SecurityController extends Controller
         die;
     }
 
+    public function getContent($userId)
+    {   
+        $user = $this->get(UserService::class)->getUserById($userId);
+        $link = 'http://127.0.0.1:8000/app_dev.php/enable_user?user=' . $userId . '&token=' . $user->getConfirmationToken();
+        return '<html><body>Acesse o <a href="' . $link . '">link</a> para ativar sua conta. </body></html>';
+    }
+
     /**
      *
      * @Route("/edit_user", name="edit_user")
@@ -84,7 +95,7 @@ class SecurityController extends Controller
     public function editAction(Request $request) 
     {    
         $userRegister = $this->get(UserService::class);
-        $user = $userRegister->editUser($request);
+        $user = $userRegister->editUser($this->getUser()->getId());
 
         header('Content-type: application/json');
 
@@ -155,4 +166,20 @@ class SecurityController extends Controller
         die;
     }
 
+    /**
+     *
+     * @Route("/switch_user_after_login", name="switch_user_after_login")
+     */
+    public function swichUserAfterLogin() 
+    { 
+        $roles = $this->getUser()->getRoles();
+        
+        if (in_array('ROLE_TUTOR', $roles)) {
+            echo 'Redirect to tutor area';
+            die;
+        }
+
+        echo 'Redirect to learner area';
+        die;
+    }
 }

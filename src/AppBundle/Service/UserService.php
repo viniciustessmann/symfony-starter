@@ -9,13 +9,14 @@ use AppBundle\Entity\User;
 class UserService
 {
     protected $em;
+    protected $mailer;
 
     public function __construct(EntityManager $entityManager)
     {
         $this->em = $entityManager;
     }
 
-    private function getUserById($id)
+    public function getUserById($id)
     {
         $user = $this->em->getRepository(User::class)->findOneById($id);
         
@@ -26,9 +27,8 @@ class UserService
         return $user;
     }
 
-    public function infoUser($data)
+    public function infoUser($id)
     {
-        $id = $data->request->get('id');
         $user = self::getUserById($id);
 
         if (!$user) {
@@ -72,9 +72,8 @@ class UserService
         return $user->getId();
     }
 
-    public function editUser($data)
-    {
-        $id = $data->request->get('id');
+    public function editUser($id)
+    {   
         $user = self::getUserById($id);
 
         if (!$user) {
@@ -130,24 +129,22 @@ class UserService
     public function enableUser($data)
     {   
         $errors = [];
-        if ($data->request->get('token') === null) {
+        if ($_GET['token'] === null) {
             $errors[] = 'Token confirmation is required';
         }
 
-        if ($data->request->get('id') === null) {
+        if ($_GET['user'] === null) {
             $errors[] = 'Param id is required';
         }
 
-        $id = $data->request->get('id');
-
+        $id = $_GET['user'];
         $user = self::getUserById($id);
-
 
         if (!$user and isset($id)) {    
             $errors[] = 'User (' . $id . ') not found.';
         }
 
-        if ($data->request->get('token') != $user->getConfirmationToken()) {
+        if ($_GET['token'] != $user->getConfirmationToken()) {
             $errors[] = 'This token ' . $user->request->get('token') . ' is incorrect.';
         }
 

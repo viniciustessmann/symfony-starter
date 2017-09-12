@@ -37,6 +37,8 @@ services:
         arguments: 
             - "@doctrine.orm.entity_manager"
             - "@security.encoder_factory"
+            - "@mailer"
+
     # add more services, or override services that need manual wiring
     # AppBundle\Service\ExampleService:
     #     arguments:
