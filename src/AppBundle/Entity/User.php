@@ -17,10 +17,30 @@ class User extends BaseUser
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+    
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    protected $created;
 
     public function __construct()
     {
         parent::__construct();
-        // your own logic
+
+        $this->setCreated(new \DateTime());
+        if ($this->getModified() == null) {
+            $this->setModified(new \DateTime());
+        }
     }
+
+    public function setCreated($created)
+    {
+        $this->created = $created;
+    }
+
+    public function getModified()
+    {
+        return $this->created;
+    }
+
 }
