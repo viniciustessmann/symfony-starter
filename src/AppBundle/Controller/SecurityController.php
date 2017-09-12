@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 use FOS\UserBundle\Doctrine\UserManager;
 use AppBundle\Entity\User;
 use AppBundle\Service\UserService;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 
 class SecurityController extends Controller
 {   
@@ -38,8 +40,25 @@ class SecurityController extends Controller
      */
     public function createAction(Request $request) 
     {    
+
+        $user = new User();
+
+        $plainPassword = 'ryanpass';
+        $encoder_service = $this->get('security.encoder_factory');
+        $encoder = $encoder_service->getEncoder($user);
+
+        $user->setSalt(md5(uniqid(null, true)));
+        $password = $encoder->encodePassword('123456', $user->getSalt());
+
+        $user->setUsername($request->request->get('name') . date('h:i:s'));
+        $user->setEmail($request->request->get('email')  . date('h:i:s'));
+        $user->setConfirmationToken(md5(date('Y-m-d h:i:s')));
+        $user->setPassword($password);
+        $user->addRole($request->request->get('role'));
+
+
         $userRegister = $this->get(UserService::class);
-        $userId = $userRegister->registerUser($request);
+        $userId = $userRegister->registerUser($user);
 
         header('Content-type: application/json');
 

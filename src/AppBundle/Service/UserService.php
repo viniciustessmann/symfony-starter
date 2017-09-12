@@ -3,12 +3,13 @@
 namespace AppBundle\Service;
 
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use AppBundle\Entity\User;
 
 class UserService
 {
     protected $em;
-    
+
     public function __construct(EntityManager $entityManager)
     {
         $this->em = $entityManager;
@@ -45,9 +46,10 @@ class UserService
         ];
     }
 
-    public function registerUser($data)
+    public function registerUser($user)
     {   
-        $errors = self::validateForm($data);
+
+        $errors = self::validateForm($user);
         if ($errors) {
             return [
                 'error' => true,
@@ -55,13 +57,6 @@ class UserService
                 'errors' => $errors
             ];
         }
-
-        $user = new User();
-        $user->setUsername($data->request->get('name') . date('h:i:s'));
-        $user->setEmail($data->request->get('email')  . date('h:i:s'));
-        $user->setConfirmationToken(md5(date('Y-m-d h:i:s')));
-        $user->setPassword('123456');
-        $user->addRole($data->request->get('role'));
 
         try {
             $this->em->persist($user);
@@ -144,14 +139,16 @@ class UserService
         }
 
         $id = $data->request->get('id');
+
         $user = self::getUserById($id);
+
 
         if (!$user and isset($id)) {    
             $errors[] = 'User (' . $id . ') not found.';
         }
 
         if ($data->request->get('token') != $user->getConfirmationToken()) {
-            $errors[] = 'This token ' . $data->request->get('token') . ' is incorrect.';
+            $errors[] = 'This token ' . $user->request->get('token') . ' is incorrect.';
         }
 
         if ($errors) {
@@ -184,21 +181,22 @@ class UserService
     {
         $errors = [];
 
-        if ($data->request->get('name') === null) {
+        if ($data->getUsername() === null) {
             $errors[] = 'Param name is required';
         }
 
-        if ($data->request->get('email') === null) {
+        if ($data->getEmail() === null) {
             $errors[] = 'Param email is required';
         }
 
-        if ($data->request->get('role') === null) {
+        if ($data->getRoles() === null) {
             $errors[] = 'Param role is required';
         }
 
-        if ($data->request->get('role') != 'TUTOR' && $data->request->get('role') != 'LEARNER') {
-            $errors[] = 'Use TUTOR or LEARNER to param role';
-        }
+        //TO DO - verify roles are valid
+        // if ($data->request->get('role') != 'TUTOR' && $data->request->get('role') != 'LEARNER') {
+        //     $errors[] = 'Use TUTOR or LEARNER to param role';
+        // }
 
         return $errors;
     }
