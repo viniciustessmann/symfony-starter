@@ -1,0 +1,11 @@
+<h1>Estados</h1>
+
+<table>
+	{% for state in states %}
+		<tr>
+			<td>{{state.name}}</td>
+			<td><a href="{{ path('edit_state_form', {'id': state.id}) }}">Editar</a></td>
+			<td><a href="{{ path('delete_state', {'id': state.id}) }}">Apagar</a></td>
+		</tr>
+	{% endfor %}
+</table>

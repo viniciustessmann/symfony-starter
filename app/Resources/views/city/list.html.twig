@@ -1,0 +1,12 @@
+<h1>Cidades</h1>
+
+<table>
+	{% for city in cities %}
+		<tr>
+			<td>{{city.name}}</td>
+			<td>{{city.state}}</td>
+			<td><a href="{{ path('edit_city_form', {'id': city.id}) }}">Editar</a></td>
+			<td><a href="{{ path('delete_city', {'id': city.id}) }}">Apagar</a></td>
+		</tr>
+	{% endfor %}
+</table>	

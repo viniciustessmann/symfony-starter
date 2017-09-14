@@ -1,0 +1,16 @@
+<h1>Treinamentos</h1>
+
+<table>
+	{% for training in trainings %}
+		<tr>
+			<td>{{training.name}}</td>
+			<td>{{training.course}}</td>
+			<td><a href="{{ path('add_user_training', {'id': training.id}) }}">Inserir usuário</a></td>
+			<td><a href="{{ path('edit_training_form', {'id': training.id}) }}">Editar</a></td>
+			<td><a href="{{ path('delete_training', {'id': training.id}) }}">Apagar</a></td>
+		</tr>
+	{% endfor %}
+</table>	
+
+
+
