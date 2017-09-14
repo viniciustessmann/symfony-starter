@@ -31,17 +31,26 @@ class State
     */
     protected $code;
 
-    // /**
-    //  * One Product has Many Cities.
-    //  * @ORM\OneToMany(targetEntity="City", mappedBy="state")
-    //  */
-    // private $city;
+    /** 
+    * @ORM\Column(type="datetime")
+    */
+    protected $created;
 
-    /**
-     * Get id
-     *
-     * @return int
-     */
+
+    public function __construct()
+    {
+
+        $this->setCreated(new \DateTime());
+        if ($this->getModified() == null) {
+            $this->setModified(new \DateTime());
+        }
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
     public function getId()
     {
         return $this->id;
@@ -52,9 +61,29 @@ class State
         $this->name = $name;
     }
 
+    public function getName()
+    {
+        return $this->name;
+    }
+
     public function setCode($code)
     {
         $this->code = $code;
+    }
+
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    public function setCreated($created)
+    {
+        $this->created = $created;
+    }
+
+    public function getModified()
+    {
+        return $this->created;
     }
 }
 

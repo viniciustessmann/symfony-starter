@@ -32,5 +32,10 @@ class TrainingService
 
         return $training->getId();
     }
+
+    public function seachTraining()
+    {
+      
+    }
 }
 
