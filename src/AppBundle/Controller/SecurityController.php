@@ -69,12 +69,13 @@ class SecurityController extends Controller
         $mailerService = $this->get(MailerService::class);
         
         $content = self::getContent($userId);
-        $responseMailer = $mailerService->sendEmail('viniciusschleetessmann@gmail.com', 'Ative sua conta', $content);
+        //$responseMailer = $mailerService->sendEmail('viniciusschleetessmann@gmail.com', 'Ative sua conta', $content);
 
         $response = [
             'success' => true,
             'message' => 'Success add user',
-            'userId' => $userId
+            'userId' => $userId,
+            'link' => $content
         ];
         
         echo json_encode($response);
@@ -85,7 +86,8 @@ class SecurityController extends Controller
     {   
         $user = $this->get(UserService::class)->getUserById($userId);
         $link = 'http://127.0.0.1:8000/app_dev.php/enable_user?user=' . $userId . '&token=' . $user->getConfirmationToken();
-        return '<html><body>Acesse o <a href="' . $link . '">link</a> para ativar sua conta. </body></html>';
+        //return '<html><body>Acesse o <a href="' . $link . '">link</a> para ativar sua conta. </body></html>';
+        return $link;
     }
 
     /**
