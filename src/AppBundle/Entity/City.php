@@ -34,7 +34,7 @@ class City
     /**
      * Many Cities have One City.
      * @ORM\ManyToOne(targetEntity="State", inversedBy="cities")
-     * @ORM\JoinColumn(name="state_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="state_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $state;
 
@@ -46,7 +46,7 @@ class City
             $this->setModified(new \DateTime());
         }
     }
-    
+
     /**
      * Get id
      *

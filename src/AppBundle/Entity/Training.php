@@ -50,10 +50,19 @@ class Training
      */
     private $course;
 
+    /**
+    * @ORM\ManyToMany(targetEntity="User")
+    * @ORM\JoinTable(name="users_trainings",
+    *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+    *      inverseJoinColumns={@ORM\JoinColumn(name="use_id", referencedColumnName="id")}
+    *      )
+    */
+    private $users;
+
     public function __construct()
     {
 
-        $this->courses = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->users = new \Doctrine\Common\Collections\ArrayCollection();
 
         $this->setCreated(new \DateTime());
         if ($this->getModified() == null) {
@@ -87,10 +96,6 @@ class Training
         return $this->description;
     }
 
-    public function setCourse(Course $course)
-    {
-        $this->course = $course;
-    }
 
     public function setCreated($created)
     {
@@ -102,10 +107,24 @@ class Training
         return $this->created;
     }
 
-    public function getUser()
+    public function setUsers(User $user)
     {
-        return $this->user;
+        $this->users->add($user);
     }
 
+    public function getUsers()
+    {
+        return $this->users;
+    }
+
+    public function setCourse(Course $course)
+    {
+        $this->course = $course;
+    }
+
+    public function getCourse()
+    {
+        return $this->course;
+    }
 }
 

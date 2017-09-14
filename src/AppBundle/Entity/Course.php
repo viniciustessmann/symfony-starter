@@ -31,20 +31,19 @@ class Course
      */
     protected $description;
 
-    /**
-     * Many Groups have Many Users.
-     * @ORM\ManyToMany(targetEntity="User", mappedBy="courses")
-     */
-    private $users;
+    /** 
+    * @ORM\Column(type="datetime")
+    */
+    protected $created;
 
-     /**
-     * @ORM\ManyToOne(targetEntity="City", inversedBy="cities")
-     * @ORM\JoinColumn(name="city_id", referencedColumnName="id")
-     */
-    private $city;
 
-    public function __construct() {
-        $this->users = new \Doctrine\Common\Collections\ArrayCollection();
+    public function __construct()
+    {
+
+        $this->setCreated(new \DateTime());
+        if ($this->getModified() == null) {
+            $this->setModified(new \DateTime());
+        }
     }
 
     /**
@@ -77,29 +76,15 @@ class Course
         return $this->description;
     }
 
-    public function setCity(City $city)
+    public function setCreated($created)
     {
-        $this->city = $city;
+        $this->created = $created;
     }
 
-    public function getCity()
+    public function getModified()
     {
-        return $this->city;
+        return $this->created;
     }
 
-    public function addUser($user)
-    {   
-        $this->users->add($user);
-    }
-
-    public function getUsers()
-    {
-        return $this->users;
-    }
-
-    public function CheckHasUser($user)
-    {
-        return $this->users->contains($user);
-    }
 }
 

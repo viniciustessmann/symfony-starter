@@ -17,30 +17,88 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class TrainingController extends Controller
 {
-    
+    /**
+    *
+    * @Route("/list_training", name="list_training")
+    */
+    public function listAction() 
+    {
+        $trainings = $this->get(Trainingservice::class)->getAllTrainings();
+
+        return $this->render('training/list.html.twig', array(
+            'trainings' => $trainings,
+        ));
+    }   
+
+
     /**
     *
     * @Route("/create_training_form", name="create_training_form")
     */
     public function createFormAction(Request $request) 
     {  
-
         $training = new Training();
+
+        $courses = $this->get(CourseService::class)->getAllCoursesList();
 
         $form = $this->createFormBuilder($training)
             ->setAction($this->generateUrl('create_training'))
             ->add('name', TextType::class)
             ->add('description', TextType::class)
-            ->add('save', SubmitType::class, array('label' => 'Create Post'))
+            ->add('course', ChoiceType::class,  ['choices' => $courses])
+            ->add('save', SubmitType::class, array('label' => 'Criar treinamento'))
             ->getForm();
 
-        return $this->render('default/new.html.twig', array(
+        return $this->render('training/new.html.twig', array(
             'form' => $form->createView(),
         ));
+    }   
+
+
+    /**
+    *
+    * @Route("/edit_training_form/{id}", name="edit_training_form",  requirements={"id": "\d+"})
+    */
+    public function editFormAction($id) 
+    {  
+        $training = $this->get(TrainingService::class)->getTrainingById($id);
+
+        $courses = $this->get(CoursesService::class)->getAllCoursesList();
+
+        $form = $this->createFormBuilder($training)
+            ->setAction($this->generateUrl('create_training'))
+            ->add('id', HiddenType::class)
+            ->add('name', TextType::class)
+            ->add('description', TextType::class)
+            ->add('save', SubmitType::class, array('label' => 'Atualizar treinamento'))
+            ->getForm();
+
+        return $this->render('training/new.html.twig', array(
+            'form' => $form->createView(),
+        ));
+    }   
+
+    /**
+    *
+    * @Route("/delete_training/{id}", name="delete_training",  requirements={"id": "\d+"})
+    */
+    public function deleteFormAction($id) 
+    {  
+        $response = $this->get(TrainingService::class)->deleteTrainingById($id);
+
+        if (isset($response['error'])) {
+            echo $response['message'];
+            die;
+        }
+
+        echo 'Treinamento <b>' . $id . '</b> deletado com sucesso!';
+        die;
     }   
 
     /**
@@ -55,7 +113,7 @@ class TrainingController extends Controller
         $training = new Training();
         $training->setName($data['name']);
         $training->setDescription($data['description']);
-        $training->setCourse($this->get(CourseService::class)->getCourseById(1));
+        $training->setCourse($this->get(CourseService::class)->getCourseById($data['course']));
 
         $response = $this->get(TrainingService::class)->addTraining($training);
 
