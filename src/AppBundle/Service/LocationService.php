@@ -32,6 +32,19 @@ class LocationService
         return $states;
     }
 
+    public function getAllStatesList()
+    {
+        $results =  $this->em->getRepository(State::class)->findAll();
+
+        $states = [];
+
+        foreach ($results as $result) {
+            $states[$result->getName()] = $result->getId();
+        }
+
+        return $states;
+    }
+
     public function addState(State $state)
     {   
         try {
@@ -78,6 +91,24 @@ class LocationService
         return true;
     }
 
+    public function getAllCities()
+    {
+        $results =  $this->em->getRepository(City::class)->findAll();
+
+        $cities = [];
+
+        foreach ($results as $result) {
+
+            $cities[] = [
+                'id' => $result->getId(),
+                'name' => $result->getName(),
+                'state' => $result->getState()->getName()
+            ];
+        }
+
+        return $cities;
+    }
+
     public function getCityById($cityId)
     {
         $city = $this->em->getRepository(City::class)->findOneById($cityId);
@@ -91,7 +122,36 @@ class LocationService
 
     public function addCity(City $city)
     {   
-        $this->em->persist($city);
-        $this->em->flush();
+        try {
+            $this->em->persist($city);
+            $this->em->flush();
+        } catch(\Doctrine\DBAL\DBALException $e) {
+            
+           return [
+               'error' => true,
+               'message' => $e->getMessage()
+           ];
+        }
+
+        return $city->getId();
+    }
+
+    public function deleteCityById($id)
+    {
+
+        $city = $this->getCityById($id);
+
+        try {
+            $this->em->remove($city);
+            $this->em->flush();
+        } catch(\Doctrine\DBAL\DBALException $e) {
+            
+           return [
+               'error' => true,
+               'message' => $e->getMessage()
+           ];
+        }
+
+        return true;
     }
 }

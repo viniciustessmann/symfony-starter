@@ -26,6 +26,11 @@ class City
     */
     protected $name;
     
+    /** 
+    * @ORM\Column(type="datetime")
+    */
+    protected $created;
+
     /**
      * Many Cities have One City.
      * @ORM\ManyToOne(targetEntity="State", inversedBy="cities")
@@ -33,6 +38,15 @@ class City
      */
     private $state;
 
+    public function __construct()
+    {
+
+        $this->setCreated(new \DateTime());
+        if ($this->getModified() == null) {
+            $this->setModified(new \DateTime());
+        }
+    }
+    
     /**
      * Get id
      *
@@ -56,6 +70,20 @@ class City
     public function setState($state)
     {
         $this->state = $state;
+    }
+
+    public function getState()
+    {
+        return $this->state;
+    }
+        public function setCreated($created)
+    {
+        $this->created = $created;
+    }
+
+    public function getModified()
+    {
+        return $this->created;
     }
 }
 

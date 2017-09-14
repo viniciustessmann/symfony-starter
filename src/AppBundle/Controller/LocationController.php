@@ -12,6 +12,7 @@ use AppBundle\Service\LocationService;
 use AppBundle\Service\UserService;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class LocationController extends Controller
@@ -25,7 +26,7 @@ class LocationController extends Controller
     {   
         $states = $this->get(LocationService::class)->getAllStates();
 
-        return $this->render('location/list.html.twig', array(
+        return $this->render('state/list.html.twig', array(
             'states' => $states,
         ));
     }
@@ -118,6 +119,20 @@ class LocationController extends Controller
         die;
     }
 
+
+    /**
+    *
+    * @Route("/list_city", name="list_city")
+    */
+    public function listCity()
+    {
+        $cities = $this->get(LocationService::class)->getAllCities();
+
+        return $this->render('city/list.html.twig', array(
+            'cities' => $cities,
+        ));
+    }
+
     /**
     *
     * @Route("/create_city_form", name="create_city_form")
@@ -126,10 +141,12 @@ class LocationController extends Controller
     {   
         $city = new City();
 
+        $states = $this->get(LocationService::class)->getAllStatesList();
+
         $form = $this->createFormBuilder($city)
-            ->setAction($this->generateUrl('create_state'))
+            ->setAction($this->generateUrl('create_city'))
             ->add('name', TextType::class)
-            ->add('code', TextType::class)
+            ->add('state', ChoiceType::class,  ['choices' => $states])
             ->add('save', SubmitType::class, array('label' => 'Salvar cidade'))
             ->getForm();
 
@@ -140,16 +157,72 @@ class LocationController extends Controller
 
     /**
     *
+    * @Route("/edit_city_form/{id}", name="edit_city_form",  requirements={"id": "\d+"})
+    */
+    public function editCityForm($id)
+    {   
+
+        $city = $this->get(LocationService::class)->getCityById($id);
+
+        $states = $this->get(LocationService::class)->getAllStatesList();
+
+        $form = $this->createFormBuilder($city)
+            ->setAction($this->generateUrl('create_city'))
+            ->add('id', HiddenType::class)
+            ->add('name', TextType::class)
+            // ->add('state', ChoiceType::class)
+            ->add('save', SubmitType::class, array('label' => 'Atualizar cidade'))
+            ->getForm();
+
+        return $this->render('state/new.html.twig', array(
+            'form' => $form->createView(),
+        ));
+    }
+
+    /**
+    *
     * @Route("/create_city", name="create_city")
     */
-    public function createCity()
+    public function createCity(Request $request)
     {   
-        $city = new City();
-        $city->setName('Pelotas');
-        $city->setState($this->get(LocationService::class)->getStateById(1));
-        $location = $this->get(LocationService::class)->addCity($city);
 
-        echo 'OK';
+        $data = $request->request->get('form');
+
+        $city = new City();
+
+        if (isset($data['id'])) {
+            $city = $this->get(LocationService::class)->getCityById($data['id']);
+        }
+
+        $city->setName($data['name']);
+        $city->setState($this->get(LocationService::class)->getStateById($data['state']));
+
+        $response = $this->get(LocationService::class)->addCity($city);
+
+        if (isset($response['error'])) {
+            echo $response['message'];
+            die;
+        }
+
+        echo 'Cidade <b>' . $data['name'] . '</b> cadastrada com sucesso com o ID <b>' . $response . '</b>';
+        die;
+    }
+
+    /**
+    *
+    * @Route("/delete_city/{id}", name="delete_city",  requirements={"id": "\d+"})
+    */
+    public function deleteCity($id)
+    {   
+
+        $response = $this->get(LocationService::class)->deleteCityById($id);
+
+        if (isset($response['error'])) {
+            echo $response['message'];
+            die;
+        }
+
+        echo 'Cidade <b>' . $id . '</b> deletada com sucesso!';
         die;
     }
 
