@@ -80,9 +80,9 @@ class CourseController extends Controller
 
         $form = $this->createFormBuilder($course)
             ->setAction($this->generateUrl('create_course'))
-            ->add('name', TextType::class)
-            ->add('description', TextType::class)
-            ->add('save', SubmitType::class, array('label' => 'Salvar curso'))
+            ->add('name', TextType::class, array('label' => 'Nome do curso', 'attr' => array('class' => 'form-control')))
+            ->add('description', TextType::class, array('label' => 'Descrição do curso', 'attr' => array('class' => 'form-control')))
+            ->add('save', SubmitType::class, array('attr' => array('class' => 'btn btn-primary', 'style' => 'margin-top: 20px;'),  'label' => 'Salvar curso'))
             ->getForm();
 
         return $this->render('course/new.html.twig', array(
