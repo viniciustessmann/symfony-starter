@@ -75,7 +75,7 @@ class CourseController extends Controller
     */
     public function createFormAction() 
     {    
-
+        $user = $this->get(UserService::class)->getUserById(7);
         $course = new Course();
 
         $form = $this->createFormBuilder($course)

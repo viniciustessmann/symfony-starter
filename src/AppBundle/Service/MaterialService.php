@@ -31,5 +31,35 @@ class MaterialService
 
         return $material->getId();
     }
-}
 
+    public function getInfoMaterial($materialId)
+    {
+        $material = self::getMaterialById($materialId);
+        
+        if (!$material) {
+            return [
+                'error' => true,
+                'message' => 'material (' . $id . ') not found.'
+            ];
+        }
+
+        return [
+            'id' => $materialId,
+            'name' => $material->getName(),
+            'date' => $material->getModified(),
+            'user' => $material->getUser(),
+            'course' => $material->getCourse()
+        ];
+    }
+
+    public function getMaterialById($materialId)
+    {
+        $material = $this->em->getRepository(Material::class)->findOneById($materialId);
+        
+        if (!$material) {
+            return false;
+        }
+
+        return $material;
+    }
+}
