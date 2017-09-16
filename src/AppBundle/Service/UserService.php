@@ -16,6 +16,17 @@ class UserService
         $this->em = $entityManager;
     }
 
+    public function getUserByEmail($email)
+    {
+        $user = $this->em->getRepository(User::class)->findOneByEmail($email);
+        
+        if (!$user) {
+            return false;
+        }
+
+        return $user;
+    }
+
     public function getUserById($id)
     {
         $user = $this->em->getRepository(User::class)->findOneById($id);

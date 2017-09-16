@@ -107,7 +107,6 @@ class TrainingController extends Controller
     */
     public function createAction(Request $request) 
     {   
-
         $data = $request->request->get('form');
     
         $training = new Training();
@@ -126,4 +125,52 @@ class TrainingController extends Controller
         die;
     }   
 
+    /**
+    *
+    * @Route("/add_user_training/{id}", name="add_user_training",   requirements={"id": "\d+"})
+    */
+    public function addUserTrainingForm($id) 
+    {   
+
+        $form = $this->createFormBuilder()
+            ->setAction($this->generateUrl('insert_user_training'))
+            ->add('email', TextType::class)
+            ->add('training_id', HiddenType::class, array('data' => $id))
+            ->add('save', SubmitType::class, array('label' => 'Inserir usuário'))
+            ->getForm();
+
+        return $this->render('training/insert_user.html.twig', array(
+            'form' => $form->createView(),
+        ));
+    }
+
+    /**
+    *
+    * @Route("/insert_user_training", name="insert_user_training")
+    */
+    public function addUserTraining(Request $request) 
+    { 
+        $data = $request->request->get('form');
+
+        $user = $this->get(UserService::class)->getUserByEmail($data['email']);
+
+        if (!$user) {
+            echo 'Usuário não cadastrado!';
+            die;
+        }
+
+        $training = $this->get(TrainingService::class)->getTrainingById($data['training_id']);
+
+        $training->setUsers($user);
+
+        $response = $this->get(TrainingService::class)->addTraining($training);
+
+        if (isset($response['error'])) {
+            echo $response['message'];
+            die;
+        }
+
+        echo 'Usuário adicionado com sucesso.';
+        die;
+    }
 }
