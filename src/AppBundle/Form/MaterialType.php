@@ -13,12 +13,13 @@ class MaterialType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {   
+
         $builder
             ->setAction($options['action'])
-            ->add('name', TextType::class)
-            ->add('description', TextType::class)
-            ->add('file', FileType::class)
-            ->add('save', SubmitType::class, array('label' => 'Criar material'));
+            ->add('name', TextType::class, array('label' => 'Nome do curso', 'attr' => array('class' => 'form-control')))
+            ->add('description', TextType::class, array('label' => 'Descrição do curso', 'attr' => array('class' => 'form-control')))
+            ->add('file', FileType::class, array('label' => 'Arquivo', 'attr' => array('class' => 'form-control')))
+            ->add('save', SubmitType::class, array('attr' => array('class' => 'btn btn-primary', 'style' => 'margin-top: 20px;'),  'label' => 'Salvar material'));
     }
 
 }

@@ -4,6 +4,9 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 
 /**
  * Material
@@ -29,11 +32,15 @@ class Material
     */
     protected $name;
 
-    /**
-    * @ORM\Column(name="file", type="string", length=255, nullable=true)
-    * @Gedmo\UploadableFilePath
-    */
+   /**
+     * @Assert\File(maxSize="6000000")
+     */
     protected $file;
+
+     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $path;
 
     /**
     * @ORM\Column(type="string", length=255)
@@ -97,11 +104,21 @@ class Material
         return $this->description;
     }
 
-    public function setFile($file)
+    /**
+     * Sets file.
+     *
+     * @param UploadedFile $file
+     */
+    public function setFile(UploadedFile $file)
     {
-        $this->$file = $file;
+        $this->file = $file;
     }
 
+    /**
+     * Get file.
+     *
+     * @return UploadedFile
+     */
     public function getFile()
     {
         return $this->file;
@@ -141,6 +158,34 @@ class Material
     public function getPath()
     {
         return '/files';
+    }
+
+    public function getAbsolutePath()
+    {
+        return null === $this->path
+            ? null
+            : $this->getUploadRootDir().'/'.$this->path;
+    }
+
+    public function getWebPath()
+    {
+        return null === $this->path
+            ? null
+            : $this->getUploadDir().'/'.$this->path;
+    }
+
+    public function getUploadRootDir()
+    {
+        // the absolute directory path where uploaded
+        // documents should be saved
+        return __DIR__.'/../../../../web/'.$this->getUploadDir();
+    }
+
+    public function getUploadDir()
+    {
+        // get rid of the __DIR__ so it doesn't screw up
+        // when displaying uploaded doc/image in the view.
+        return 'uploads/material';
     }
 }
 

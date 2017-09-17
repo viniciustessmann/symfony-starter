@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use AppBundle\Form\MaterialType;
+use AppBundle\Service\UploadService;
 
 class MaterialController extends Controller
 {
@@ -31,7 +32,7 @@ class MaterialController extends Controller
     	$material = new Material();
     	$form = $this->createForm(MaterialType::class, $material, ['action' => $this->generateUrl('create_material')]);
 
-        return $this->render('default/new.html.twig', array(
+        return $this->render('material/new.html.twig', array(
             'form' => $form->createView(),
         ));
     }	
@@ -43,34 +44,17 @@ class MaterialController extends Controller
     public function createMaterial(Request $request)
     {   
         $file = $request->files->get('material')['file'];
-        $filename = $file->getClientOriginalName();
         $data = $request->request->get('material');
 
         $material = new Material();
 
         $material->setName($data['name']);
         $material->setDescription($data['description']);
-        $material->setUser($this->get(UserService::class)->getUserById(1));
         $material->setCourse($this->get(CourseService::class)->getCourseById(1));
-        $material->setFile('test');
+        $material->setFile($file);
 
-        $response = $this->get(MaterialService::class)->addMaterial($material);
         
-        if (isset($response['error'])) {
-            echo $response['message'];
-            die;
-        }
-
-        dump($material->getPath());
-        dump($material);
-
-
-        $uploadableManager = $this->get('stof_doctrine_extensions.uploadable.manager');
-        $uploadableManager->markEntityToUpload($material, $material->getFile());
-
-        dump($uploadableManager);
-        dump($file);
-        dump($material);die;
+        UploadService::uploadFile($material);
 
         $response = $this->get(MaterialService::class)->addMaterial($material);
         
