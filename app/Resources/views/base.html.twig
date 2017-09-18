@@ -68,6 +68,7 @@
     <aside class="main-sidebar">
         <section class="sidebar">
             <ul class="sidebar-menu">
+
                 <li class="header">MENU</li>
 
                 <li class="treeview">
@@ -82,6 +83,7 @@
                         <li><a href="{{ path('create_course_form') }}"><i class="fa fa-circle-o"></i> Cadastrar curso</a></li>
                     </ul>
                 </li>
+
                 <li class="treeview">
                     <a href="#">
                         <i class="fa fa-table"></i> <span>Treinamentos</span>
@@ -94,6 +96,7 @@
                         <li><a href="{{ path('create_training_form') }}"><i class="fa fa-circle-o"></i> Cadastrar treinamentos</a></li>
                     </ul>
                 </li>
+
                 <li class="treeview">
                     <a href="#">
                         <i class="fa fa-table"></i> <span>Alunos</span>
@@ -120,12 +123,19 @@
                     </ul>
                 </li>
 
-                </li>
-                <li class="">
-                    <a href="{{ path('create_material_form') }}">
-                        <i class="fa fa-dashboard"></i>
-                        <span>Material</span>
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-table"></i> <span>Cidades / Estados</span>
+                        <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                        </span>
                     </a>
+                    <ul class="treeview-menu">
+                        <li><a href="{{ path('list_city',  {'type': 'tutor'}) }}"><i class="fa fa-circle-o"></i> Listar cidades</a></li>
+                        <li><a href="{{ path('create_city_form') }}"><i class="fa fa-circle-o"></i> Cadastrar cidade</a></li>
+                        <li><a href="{{ path('list_state') }}"><i class="fa fa-circle-o"></i> Listar estados</a></li>
+                        <li><a href="{{ path('create_state_form') }}"><i class="fa fa-circle-o"></i> Cadastrar estado</a></li>
+                    </ul>
                 </li>
 
                 <li class="">

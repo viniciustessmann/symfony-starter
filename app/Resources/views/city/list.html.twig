@@ -1,12 +1,71 @@
-<h1>Cidades</h1>
+{% extends 'base.html.twig' %}
+{% block content %}
+	
+    <section class="content-header">
+      <h1>
+        Cidades cadastradas
+      </h1>
+    </section>
 
-<table>
-	{% for city in cities %}
-		<tr>
-			<td>{{city.name}}</td>
-			<td>{{city.state}}</td>
-			<td><a href="{{ path('edit_city_form', {'id': city.id}) }}">Editar</a></td>
-			<td><a href="{{ path('delete_city', {'id': city.id}) }}">Apagar</a></td>
-		</tr>
-	{% endfor %}
-</table>	
+    <section class="content">
+        <div class="box-body">
+            <div class="media-body">
+                    <div class="clearfix">
+                        <p class="pull-left">
+                            <a href="{{ path('create_city_form') }}" class="btn btn-success btn-sm">
+                                Cadastrar cidade
+                            </a>
+                        </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Cidades cadastradas</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table role="grid" class="table table-bordered table-striped dataTable" id="dtable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+									<th>Estado</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for city in cities %}
+                                    <tr>
+                                        <td>{{ city.id }}</td>
+                                        <td>{{ city.name }}</td>
+										<td>{{ city.state }}</td>
+                                        <td>
+                                            {# <a style="margin-right:5px" href="{{ path('detail_city', {'id': city.id}) }}" class="btn-sm btn-primary">
+                                                <i class="fa fa-eye fa-lg"></i>
+                                            </a> #}
+                                            <a style="margin-right:5px" href="{{ path('edit_city_form', {'id': city.id}) }}" class="btn-sm btn-info">
+                                                <i class="fa fa-edit fa-lg"></i>
+                                            </a>
+                                            <a style="margin-right:5px" onclick="return confirm('Você tem certeza?')" href="{{ path('delete_city', {'id': city.id}) }}" class="btn-sm btn-danger">
+                                                <i class="fa fa-trash-o fa-lg"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+</div>
+
+{% endblock %}
+
+

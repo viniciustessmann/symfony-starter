@@ -14,6 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use AppBundle\Form\StateType;
+use AppBundle\Form\CityType;
 
 class LocationController extends Controller
 {   
@@ -39,12 +41,7 @@ class LocationController extends Controller
     {   
         $state = new State();
 
-        $form = $this->createFormBuilder($state)
-            ->setAction($this->generateUrl('create_state'))
-            ->add('name', TextType::class)
-            ->add('code', TextType::class)
-            ->add('save', SubmitType::class, array('label' => 'Salvar estado'))
-            ->getForm();
+        $form = $this->createForm(StateType::class, $state, ['action' => $this->generateUrl('create_state')]);
 
         return $this->render('state/new.html.twig', array(
             'form' => $form->createView(),
@@ -83,12 +80,13 @@ class LocationController extends Controller
         $response = $this->get(LocationService::class)->deleteStateById($id);
 
         if (isset($response['error'])) {
-            echo $response['message'];
-            die;
+
+            $this->get('session')->getFlashBag()->add('notice', 'Erroao apagar o estado. ' . $response['message']);
+            return $this->redirect('/list_state');
         }
 
-        echo 'Estado <b>' . $id . '</b> deletado com sucesso!';
-        die;
+        $this->get('session')->getFlashBag()->add('notice', 'Estado apagado com sucesso');
+        return $this->redirect('/list_state');
     }
 
     /**
@@ -97,8 +95,7 @@ class LocationController extends Controller
     */
     public function createState(Request $request)
     {   
-
-        $data = $request->request->get('form');
+        $data = $request->request->get('state');
         $state = new State();
 
         if (isset($data['id'])) {
@@ -111,14 +108,13 @@ class LocationController extends Controller
         $response = $this->get(LocationService::class)->addState($state);
 
         if (isset($response['error'])) {
-            echo $response['message'];
-            die;
+            $this->get('session')->getFlashBag()->add('notice', 'Erro ao inserir o estado. ' . $response['message']);
+            return $this->redirect('/list_state');
         }
 
-        echo 'Estado <b>' . $data['name'] . '</b> cadastrado com sucesso com o ID <b>' . $response . '</b>';
-        die;
+        $this->get('session')->getFlashBag()->add('notice', 'Estado Criado com sucesso');
+        return $this->redirect('/list_state');
     }
-
 
     /**
     *
@@ -140,15 +136,8 @@ class LocationController extends Controller
     public function createFormCity()
     {   
         $city = new City();
-
         $states = $this->get(LocationService::class)->getAllStatesList();
-
-        $form = $this->createFormBuilder($city)
-            ->setAction($this->generateUrl('create_city'))
-            ->add('name', TextType::class)
-            ->add('state', ChoiceType::class,  ['choices' => $states])
-            ->add('save', SubmitType::class, array('label' => 'Salvar cidade'))
-            ->getForm();
+        $form = $this->createForm(CityType::class, $city, ['action' => $this->generateUrl('create_city'), 'states' => $states]);
 
         return $this->render('city/new.html.twig', array(
             'form' => $form->createView(),
@@ -170,7 +159,6 @@ class LocationController extends Controller
             ->setAction($this->generateUrl('create_city'))
             ->add('id', HiddenType::class)
             ->add('name', TextType::class)
-            // ->add('state', ChoiceType::class)
             ->add('save', SubmitType::class, array('label' => 'Atualizar cidade'))
             ->getForm();
 
@@ -186,7 +174,7 @@ class LocationController extends Controller
     public function createCity(Request $request)
     {   
 
-        $data = $request->request->get('form');
+        $data = $request->request->get('city');
 
         $city = new City();
 
@@ -204,8 +192,8 @@ class LocationController extends Controller
             die;
         }
 
-        echo 'Cidade <b>' . $data['name'] . '</b> cadastrada com sucesso com o ID <b>' . $response . '</b>';
-        die;
+        $this->get('session')->getFlashBag()->add('notice', 'Cidade ' . $data['name'] .' cadastrada com sucesso.');
+        return $this->redirect('/list_city');
     }
 
     /**
@@ -218,12 +206,12 @@ class LocationController extends Controller
         $response = $this->get(LocationService::class)->deleteCityById($id);
 
         if (isset($response['error'])) {
-            echo $response['message'];
-            die;
+            $this->get('session')->getFlashBag()->add('notice', 'Erro ao apagar cidade. ' . $response['message']);
+            return $this->redirect('/list_city');
         }
 
-        echo 'Cidade <b>' . $id . '</b> deletada com sucesso!';
-        die;
+        $this->get('session')->getFlashBag()->add('notice', 'Cidade apagada com sucesso.');
+        return $this->redirect('/list_city');
     }
 
 }

@@ -162,7 +162,6 @@ class TrainingController extends Controller
     */
     public function addUserTrainingForm($id) 
     {   
-
         $form = $this->createFormBuilder()
             ->setAction($this->generateUrl('insert_user_training'))
             ->add('email', TextType::class)

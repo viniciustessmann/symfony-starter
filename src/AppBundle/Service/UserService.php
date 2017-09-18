@@ -25,7 +25,8 @@ class UserService
             $users[] = [
                 'id' => $data->getId(),
                 'name' => $data->getName(),
-                'email' => $data->getEmail()
+                'email' => $data->getEmail(),
+                'active' => $data->isEnabled()
             ];
         }
 

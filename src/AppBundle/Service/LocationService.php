@@ -25,7 +25,7 @@ class LocationService
             $states[] = [
                 'id' => $result->getId(),
                 'name' => $result->getName(),
-                'cide' => $result->getCode()
+                'code' => $result->getCode()
             ];
         }
 
