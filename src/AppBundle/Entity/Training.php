@@ -57,6 +57,18 @@ class Training
     private $course;
 
     /**
+     * @ORM\ManyToOne(targetEntity="City", inversedBy="trainings")
+     * @ORM\JoinColumn(name="city_id", referencedColumnName="id")
+     */
+    private $city;
+
+     /**
+     * @ORM\ManyToOne(targetEntity="State", inversedBy="trainings")
+     * @ORM\JoinColumn(name="state_id", referencedColumnName="id")
+     */
+    private $state;
+
+    /**
     * @ORM\ManyToMany(targetEntity="User")
     * @ORM\JoinTable(name="users_trainings",
     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
@@ -141,6 +153,26 @@ class Training
     public function getStarter()
     {
         return $this->starter;
+    }
+
+    public function setCity(City $city)
+    {
+        $this->city = $city;
+    }
+
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    public function setState(State $state)
+    {
+        $this->state = $state;
+    }
+
+    public function getState()
+    {
+        return $this->state;
     }
 }
 

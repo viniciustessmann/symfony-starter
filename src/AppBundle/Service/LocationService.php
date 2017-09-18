@@ -45,6 +45,19 @@ class LocationService
         return $states;
     }
 
+    public function getAllCitiesList()
+    {
+        $results =  $this->em->getRepository(City::class)->findAll();
+
+        $states = [];
+
+        foreach ($results as $result) {
+            $states[$result->getName()] = $result->getId();
+        }
+
+        return $states;
+    }
+
     public function addState(State $state)
     {   
         try {

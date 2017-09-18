@@ -12,6 +12,7 @@ use AppBundle\Service\UserService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\TrainingService;
 use AppBundle\Service\CourseService;
+use AppBundle\Service\LocationService;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Form\FormBuilder;
@@ -62,7 +63,9 @@ class TrainingController extends Controller
             'date' => $training->getStarter()->format('d/m/Y'),
             'course' => $training->getCourse()->getName(),
             'courseId' => $training->getCourse()->getId(),
-            'users' => $users
+            'users' => $users,
+            'city' => $training->getCity()->getName(),
+            'state' => $training->getState()->getName()
         ];
 
         return $this->render('training/detail.html.twig', $info);        
@@ -77,8 +80,10 @@ class TrainingController extends Controller
         $training = new Training();
 
         $courses = $this->get(CourseService::class)->getAllCoursesList();
+        $cities = $this->get(LocationService::class)->getAllCitiesList();
+        $states = $this->get(LocationService::class)->getAllStatesList();
 
-        $form = $this->createForm(TrainingType::class, $training, ['action' => $this->generateUrl('create_training'), 'courses' => $courses]);
+        $form = $this->createForm(TrainingType::class, $training, ['action' => $this->generateUrl('create_training'), 'courses' => $courses, 'states' => $states, 'cities' => $cities]);
 
         return $this->render('training/new.html.twig', array(
             'form' => $form->createView(),
@@ -139,6 +144,8 @@ class TrainingController extends Controller
         $training->setDescription($data['description']);
         $training->setStarter($this->converterDate($data['starter']));
         $training->setCourse($this->get(CourseService::class)->getCourseById($data['course']));
+        $training->setCity($this->get(LocationService::class)->getCityById($data['city']));
+        $training->setState($this->get(LocationService::class)->getStateById($data['state']));
 
         $response = $this->get(TrainingService::class)->addTraining($training);
 

@@ -23,6 +23,8 @@ class TrainingType extends AbstractType
             ->add('name', TextType::class, array('label' => 'Nome do treinamento', 'attr' => array('class' => 'form-control')))
             ->add('description', TextareaType::class, array('label' => 'Descrição do treinamento', 'attr' => array('class' => 'form-control')))
             ->add('course', ChoiceType::class,  ['choices' => $options['courses'], 'label' => 'Selecione o treinamento', 'attr' => ['class' => 'form-control']])
+            ->add('city', ChoiceType::class,  ['choices' => $options['cities'], 'label' => 'Selecione a cidade do treinamenot', 'attr' => ['class' => 'form-control']])
+            ->add('state', ChoiceType::class,  ['choices' => $options['states'], 'label' => 'Selecione o estado do treinamento', 'attr' => ['class' => 'form-control']])
             ->add('starter', DateType::class,  ['label' => 'Data de início do treinamento', 'attr' => ['class' => 'form-control']])
             ->add('save', SubmitType::class, array('attr' => array('class' => 'btn btn-primary', 'style' => 'margin-top: 20px;'),  'label' => 'Salvar treinamento'))
             ->getForm();
@@ -34,7 +36,11 @@ class TrainingType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Entity\Training'
-        ))->setRequired('courses');
+                'data_class' => 'AppBundle\Entity\Training'
+            ))
+            ->setRequired('courses')
+            ->setRequired('states')
+            ->setRequired('cities');
+        
     }
 }

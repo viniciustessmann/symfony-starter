@@ -37,6 +37,19 @@ class User extends BaseUser
      */
     private $trainings;
 
+
+    /**
+     * @ORM\ManyToOne(targetEntity="City", inversedBy="users")
+     * @ORM\JoinColumn(name="city_id", referencedColumnName="id")
+     */
+    private $city;
+    
+         /**
+         * @ORM\ManyToOne(targetEntity="State", inversedBy="users")
+         * @ORM\JoinColumn(name="state_id", referencedColumnName="id")
+         */
+        private $state;
+
     public function __construct()
     {
         parent::__construct();
@@ -72,6 +85,26 @@ class User extends BaseUser
     public function addTrainings($training)
     {   
         $this->trainings->add($training);
+    }
+    
+    public function setCity(City $city)
+    {
+        $this->city = $city;
+    }
+
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    public function setState(State $state)
+    {
+        $this->state = $state;
+    }
+
+    public function getState()
+    {
+        return $this->state;
     }
 
 }
