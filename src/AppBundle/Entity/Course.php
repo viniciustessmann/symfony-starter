@@ -27,7 +27,7 @@ class Course
     protected $name;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="text")
      */
     protected $description;
 
@@ -35,6 +35,11 @@ class Course
     * @ORM\Column(type="datetime")
     */
     protected $created;
+
+    /** 
+    * @ORM\Column(type="datetime", nullable=true)
+    */
+    protected $starter;
 
 
     public function __construct()
@@ -84,6 +89,16 @@ class Course
     public function getModified()
     {
         return $this->created;
+    }
+
+    public function setStarter($starter)
+    {
+        $this->starter = $starter;
+    }
+
+    public function getStarter()
+    {
+        return $this->starter;
     }
 
 }

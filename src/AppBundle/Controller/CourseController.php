@@ -13,61 +13,24 @@ use AppBundle\Service\UserService;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use AppBundle\Form\CourseType;
 
 class CourseController extends Controller
 {   
-
     /**
-     *
-     * @Route("/list_course", name="list_course")
-     */
+    *
+    * @Route("/list_course", name="list_course")
+    */
     public function listAction(Request $request) 
     {
         $courses = $this->get(CourseService::class)->getAllCourses();
-
         return $this->render('course/list.html.twig', array(
             'courses' => $courses,
         ));
     }
-
-    /**
-     *
-     * @Route("/detail_course", name="detail_course")
-     */
-    public function detailAction(Request $request) 
-    {    
-        $id = 7;
-
-        $response = [];
-
-        $course = $this->get(CourseService::class)->getCourseById($id);
-
-        $usersCoures = $course->getUsers();
-        $users = [];
-
-        foreach ($usersCoures as $user) {
-            $users[] = [
-                'name' => $user->getUsername(),
-                'email' => $user->getEmail()
-            ];
-        }
-
-        $response = [
-            'id' => $id,
-            'name' => $course->getName(),
-            'description' => $course->getDescription(),
-            'city' => $course->getCity()->getName(),
-            'users' => $users
-        ];
-
-        header('Content-type: application/json');
-        echo json_encode($response);
-        die;
-        
-    }
-
 
     /**
     *
@@ -75,19 +38,58 @@ class CourseController extends Controller
     */
     public function createFormAction() 
     {    
-        $user = $this->get(UserService::class)->getUserById(7);
         $course = new Course();
-
-        $form = $this->createFormBuilder($course)
-            ->setAction($this->generateUrl('create_course'))
-            ->add('name', TextType::class, array('label' => 'Nome do curso', 'attr' => array('class' => 'form-control')))
-            ->add('description', TextType::class, array('label' => 'Descrição do curso', 'attr' => array('class' => 'form-control')))
-            ->add('save', SubmitType::class, array('attr' => array('class' => 'btn btn-primary', 'style' => 'margin-top: 20px;'),  'label' => 'Salvar curso'))
-            ->getForm();
+        $form = $this->createForm(CourseType::class, $course, ['action' => $this->generateUrl('create_course')]);
 
         return $this->render('course/new.html.twig', array(
             'form' => $form->createView(),
         ));
+    }
+
+     /**
+    *
+    * @Route("/create_course", name="create_course")
+    */
+    public function createAction(Request $request) 
+    {    
+        $data = $request->request->get('course');
+        $course = new Course();
+
+        if (isset($data['id'])) {
+            $course = $this->get(CourseService::class)->getCourseById($data['id']);
+        }
+
+        $course->setName($data['name']);
+        $course->setDescription($data['description']);
+        $course->setStarter($this->converterDate($data['starter']));
+
+        $response = $this->get(CourseService::class)->addCourse($course);
+
+        if (isset($response['error'])) {
+            echo $response['message'];
+            die;
+        }
+
+        $this->get('session')->getFlashBag()->add('notice', 'Curso cadastrado com sucesso!');
+        return $this->redirect('list_course');
+    }
+
+    /**
+     *
+     * @Route("/detail_course/{id}", name="detail_course",  requirements={"id": "\d+"})
+     */
+    public function detailAction($id) 
+    {    
+        $course = $this->get(CourseService::class)->getCourseById($id);
+
+        $info = [
+            'id' => $course->getId(),
+            'name' => $course->getName(),
+            'description' => $course->getDescription(),
+            'date' => $course->getStarter()->format('d/m/Y')
+        ];
+
+        return $this->render('course/detail.html.twig', $info);        
     }
 
     /**
@@ -112,32 +114,11 @@ class CourseController extends Controller
         ));
     }
 
-    /**
-    *
-    * @Route("/create_course", name="create_course")
-    */
-    public function createAction(Request $request) 
-    {    
-        $data = $request->request->get('form');
-    
-        $course = new Course();
+   
 
-        if (isset($data['id'])) {
-            $course = $this->get(CourseService::class)->getCourseById($data['id']);
-        }
-
-        $course->setName($data['name']);
-        $course->setDescription($data['description']);
-
-        $response = $this->get(CourseService::class)->addCourse($course);
-
-        if (isset($response['error'])) {
-            echo $response['message'];
-            die;
-        }
-
-        echo 'Curso <b>' . $data['name'] . '</b> cadastrado com sucesso com o ID <b>' . $response . '</b>';
-        die;
+    private function converterDate($date)
+    {
+        return new \DateTime($date['year'] . '-' . $date['month'] . '-' . $date['day']);
     }
 
     /**
@@ -154,34 +135,30 @@ class CourseController extends Controller
             die;
         }
 
-        echo 'Curso <b>' . $id . '</b> deletado com sucesso!';
-        die;
+        $this->get('session')->getFlashBag()->add('notice', 'Curso deletedo com sucesso!');
+        return $this->redirect('/list_course');
     }
 
     /**
     *
-    * @Route("/set_user_course", name="set_user_course")
+    * @Route("/set_user_course/{id}", name="set_user_course",  requirements={"id": "\d+"})
     */
-    public function setUserCourse()
+    public function setUserCourse($id)
     {   
-        dump('HERE SET USER - COURSE');
 
-        $course = new Course();
+        // $course = $this->get(CourseService::class)->getCourseById($id);
+        // $user = $this->get(UserService::class)->getUserById(4);
 
-        $course = $this->get(CourseService::class)->getCourseById(7);
 
-        $user = new User();
-        $user = $this->get(UserService::class)->getUserById(4);
+        // //$course->addUser($user);
+        // $user->addCourse($course);
 
-        $course->addUser($user);
-        $user->addCourse($course);
+        // //Check this function - always retur true.
+        // $has = $course->checkHasUser($user);
 
-        //Check this function - always retur true.
-        $has = $course->checkHasUser($user);
+        // $response = $this->get(CourseService::class)->addCourse($course);
 
-        $response = $this->get(CourseService::class)->addCourse($course);
-
-        dump($response);
-        die;
+        // dump($response);
+        // die;
     } 
 }

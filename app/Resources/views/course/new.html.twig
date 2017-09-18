@@ -1,22 +1,30 @@
 {% extends 'base.html.twig' %}
 {% block content %}
+	
+    <section class="content-header">
+      <h1>
+        Cadastrar curso
+      </h1>
+    </section>
 
+    <section class="content">
+        <div class="box box-primary">
+            <div class="box">
+                <div class="box-body row">
+                    <div class="col-sm-12">
 
-    <div class="box box-primary">
-            <div class="box-header with-border">
-              <h3 class="box-title">Cadastro de curso</h3>
-            </div>
-
-            <div class="box-body">
-                <div class="form-group">
-                
-                    {{ form_start(form) }}
-
-                    
-                    {{ form_end(form) }}
-                    
+                        <div class="box-body">
+                            <div class="form-group">
+                                {{ form_start(form) }}
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-          </div>
+        </div>    
+    </section>
 
 {% endblock %}
+
+

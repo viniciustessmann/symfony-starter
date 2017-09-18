@@ -59,7 +59,9 @@ class CourseService
     }
 
     public function addCourse($course)
-    {   
+    {       
+        //dump($course);die;
+
         try {
             $this->em->persist($course);
             $this->em->flush();

@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use AppBundle\Form\TrainingType;
 
 class TrainingController extends Controller
 {
@@ -36,6 +37,36 @@ class TrainingController extends Controller
         ));
     }   
 
+    /**
+     *
+     * @Route("/detail_training/{id}", name="detail_training",  requirements={"id": "\d+"})
+     */
+    public function detailAction($id) 
+    {    
+        $training = $this->get(TrainingService::class)->getTrainingById($id);
+        $usersResult = $training->getUsers();
+
+        $users = [];
+        foreach ($usersResult as $user) {
+            $users[] = [
+                'id' => $user->getId(),
+                'name' => $user->getName(),
+                'email' => $user->getEmail()
+            ];
+        }
+
+        $info = [
+            'id' => $training->getId(),
+            'name' => $training->getName(),
+            'description' => $training->getDescription(),
+            'date' => $training->getStarter()->format('d/m/Y'),
+            'course' => $training->getCourse()->getName(),
+            'courseId' => $training->getCourse()->getId(),
+            'users' => $users
+        ];
+
+        return $this->render('training/detail.html.twig', $info);        
+    }
 
     /**
     *
@@ -47,14 +78,7 @@ class TrainingController extends Controller
 
         $courses = $this->get(CourseService::class)->getAllCoursesList();
 
-
-         $form = $this->createFormBuilder($training)
-            ->setAction($this->generateUrl('create_training'))
-            ->add('name', TextType::class, array('label' => 'Nome do curso', 'attr' => array('class' => 'form-control')))
-            ->add('description', TextType::class, array('label' => 'Descrição do curso', 'attr' => array('class' => 'form-control')))
-            ->add('course', ChoiceType::class,  ['choices' => $courses, 'label' => 'Selecione o curso', 'attr' => ['class' => 'form-control']])
-            ->add('save', SubmitType::class, array('attr' => array('class' => 'btn btn-primary', 'style' => 'margin-top: 20px;'),  'label' => 'Salvar treinamento'))
-            ->getForm();
+        $form = $this->createForm(TrainingType::class, $training, ['action' => $this->generateUrl('create_training'), 'courses' => $courses]);
 
         return $this->render('training/new.html.twig', array(
             'form' => $form->createView(),
@@ -98,8 +122,8 @@ class TrainingController extends Controller
             die;
         }
 
-        echo 'Treinamento <b>' . $id . '</b> deletado com sucesso!';
-        die;
+        $this->get('session')->getFlashBag()->add('notice', 'Treinamento deletado com sucesso!');
+        return $this->redirect('/list_training');
     }   
 
     /**
@@ -108,11 +132,12 @@ class TrainingController extends Controller
     */
     public function createAction(Request $request) 
     {   
-        $data = $request->request->get('form');
-    
+        $data = $request->request->get('training');
+
         $training = new Training();
         $training->setName($data['name']);
         $training->setDescription($data['description']);
+        $training->setStarter($this->converterDate($data['starter']));
         $training->setCourse($this->get(CourseService::class)->getCourseById($data['course']));
 
         $response = $this->get(TrainingService::class)->addTraining($training);
@@ -122,9 +147,14 @@ class TrainingController extends Controller
             die;
         }
 
-        echo 'Treinamento cadastrado com sucesso. ID ' . $response;
-        die;
+        $this->get('session')->getFlashBag()->add('notice', 'Treinamento cadastrado com sucesso!');
+        return $this->redirect('list_training');
     }   
+
+    private function converterDate($date)
+    {
+        return new \DateTime($date['year'] . '-' . $date['month'] . '-' . $date['day']);
+    }
 
     /**
     *
@@ -147,31 +177,30 @@ class TrainingController extends Controller
 
     /**
     *
-    * @Route("/insert_user_training", name="insert_user_training")
+    * @Route("/insert_user_training/{id}", name="insert_user_training", requirements={"id": "\d+"})
     */
-    public function addUserTraining(Request $request) 
-    { 
-        $data = $request->request->get('form');
-
-        $user = $this->get(UserService::class)->getUserByEmail($data['email']);
-
+    public function addUserTraining($id) 
+    {    
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+    
         if (!$user) {
-            echo 'Usuário não cadastrado!';
-            die;
+            $this->get('session')->getFlashBag()->add('notice', 'Usuário não encontrado');
+            return $this->redirect('/list_training');
         }
 
-        $training = $this->get(TrainingService::class)->getTrainingById($data['training_id']);
+
+        $training = $this->get(TrainingService::class)->getTrainingById($id);
 
         $training->setUsers($user);
 
         $response = $this->get(TrainingService::class)->addTraining($training);
 
         if (isset($response['error'])) {
-            echo $response['message'];
-            die;
+            $this->get('session')->getFlashBag()->add('notice', 'Error ao adicionar usuário ao treinamento - ' . $response['message']);
+            return $this->redirect('/list_training');
         }
 
-        echo 'Usuário adicionado com sucesso.';
-        die;
+        $this->get('session')->getFlashBag()->add('notice', 'Usuário adicionado com sucesso ao treinamento.');
+        return $this->redirect('/list_training');
     }
 }

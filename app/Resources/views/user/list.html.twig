@@ -3,7 +3,7 @@
 	
     <section class="content-header">
       <h1>
-        Cursos cadastrados
+        Alunos cadastrados
         {# <small>preview of simple tables</small> #}
       </h1>
       {# <ol class="breadcrumb">
@@ -18,8 +18,8 @@
             <div class="media-body">
                     <div class="clearfix">
                         <p class="pull-left">
-                            <a href="{{ path('create_course_form') }}" class="btn btn-success btn-sm">
-                                Cadastrar curso
+                            <a href="{{ path('create_user_form_learner') }}" class="btn btn-success btn-sm">
+                                Cadastrar aluno
                             </a>
                         </p>
                 </div>
@@ -29,7 +29,7 @@
         <div class="box box-primary">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">Cursos cadastrados</h3>
+                    <h3 class="box-title">Alunos cadastrados</h3>
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
@@ -40,22 +40,24 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Nome</th>
+                                    <th>E-mail</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for course in courses %}
+                                {% for user in users %}
                                     <tr>
-                                        <td>{{ course.id }}</td>
-                                        <td>{{ course.name }}</td>
+                                        <td>{{ user.id }}</td>
+                                        <td>{{ user.name }}</td>
+                                        <td>{{ user.email }}</td>
                                         <td>
-                                            <a style="margin-right:5px" href="{{ path('detail_course', {'id': course.id}) }}" class="btn-sm btn-primary">
+                                            <a style="margin-right:5px" href="{{ path('detail_user', {'id': user.id}) }}" class="btn-sm btn-primary">
                                                 <i class="fa fa-eye fa-lg"></i>
                                             </a>
-                                            <a style="margin-right:5px" href="{{ path('edit_course_form', {'id': course.id}) }}" class="btn-sm btn-info">
+                                            {# <a style="margin-right:5px" href="{{ path('edit_user_form', {'id': user.id}) }}" class="btn-sm btn-info">
                                                 <i class="fa fa-edit fa-lg"></i>
-                                            </a>
-                                            <a style="margin-right:5px" onclick="return confirm('Você tem certeza?')" href="{{ path('delete_course', {'id': course.id}) }}" class="btn-sm btn-danger">
+                                            </a> #}
+                                            <a style="margin-right:5px" onclick="return confirm('Você tem certeza?')" href="{{ path('delete_user', {'id': user.id}) }}" class="btn-sm btn-danger">
                                                 <i class="fa fa-trash-o fa-lg"></i>
                                             </a>
                                         </td>
@@ -71,5 +73,6 @@
 </div>
 
 {% endblock %}
+
 
 

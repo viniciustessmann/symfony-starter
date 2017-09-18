@@ -34,9 +34,15 @@ class Training
     protected $name;
 
     /**
-    * @ORM\Column(type="string", length=255)
+    * @ORM\Column(type="text")
     */
     protected $description;
+
+
+    /** 
+    * @ORM\Column(type="datetime", nullable=true)
+    */
+    protected $starter;
 
     /** 
     * @ORM\Column(type="datetime")
@@ -53,8 +59,8 @@ class Training
     /**
     * @ORM\ManyToMany(targetEntity="User")
     * @ORM\JoinTable(name="users_trainings",
-    *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-    *      inverseJoinColumns={@ORM\JoinColumn(name="use_id", referencedColumnName="id")}
+    *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+    *      inverseJoinColumns={@ORM\JoinColumn(name="use_id", referencedColumnName="id" , onDelete="CASCADE")}
     *      )
     */
     private $users;
@@ -125,6 +131,16 @@ class Training
     public function getCourse()
     {
         return $this->course;
+    }
+
+    public function setStarter($starter)
+    {
+        $this->starter = $starter;
+    }
+
+    public function getStarter()
+    {
+        return $this->starter;
     }
 }
 

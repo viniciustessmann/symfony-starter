@@ -19,6 +19,11 @@ class User extends BaseUser
     protected $id;
     
     /**
+     * @ORM\Column(type="string")
+     */
+    protected $name;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     protected $created;
@@ -26,8 +31,8 @@ class User extends BaseUser
     /**
      * @ORM\ManyToMany(targetEntity="Training")
      * @ORM\JoinTable(name="users_courses",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="training_id", referencedColumnName="id")}
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="training_id", referencedColumnName="id", onDelete="CASCADE")}
      *      )
      */
     private $trainings;
@@ -42,6 +47,16 @@ class User extends BaseUser
         if ($this->getModified() == null) {
             $this->setModified(new \DateTime());
         }
+    }
+
+    public function setName($name)
+    {   
+        $this->name = $name;
+    }
+
+    public function getName()
+    {
+        return $this->name;
     }
 
     public function setCreated($created)

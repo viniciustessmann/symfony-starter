@@ -16,6 +16,22 @@ class UserService
         $this->em = $entityManager;
     }
 
+    public function getAllUsers($filter)
+    {
+        $results = $this->em->getRepository(User::class)->findAll();
+        $users = [];
+
+        foreach ($results as $data) {
+            $users[] = [
+                'id' => $data->getId(),
+                'name' => $data->getName(),
+                'email' => $data->getEmail()
+            ];
+        }
+
+        return $users;
+    }
+
     public function getUserByEmail($email)
     {
         $user = $this->em->getRepository(User::class)->findOneByEmail($email);
@@ -111,11 +127,8 @@ class UserService
         return $user->getId();
     }
 
-    public function deleteUser($data)
+    public function deleteUser($user)
     {
-        $id = $data->request->get('id');
-        $user = self::getUserById($id);
-
         if (!$user) {
             return [
                 'error' => true,
